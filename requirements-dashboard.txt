@@ -22,3 +22,4 @@ scikit-learn>=1.4,<1.9  # precision_recall_curve only
 streamlit>=1.35
 plotly>=5.20
 networkx>=3.0,<4.0
+pyyaml>=6.0  # loads configs/response_framework_mapping.yaml for the recommendation engine's NIST/CIS labels
