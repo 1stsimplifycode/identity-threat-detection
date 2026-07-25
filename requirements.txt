@@ -1,0 +1,54 @@
+# Phase 1 dependencies
+# NOTE: pandas is pinned <3.0 because pandas 3.0.5's compiled extensions were
+# blocked outright by Windows Smart App Control / Application Control policy
+# on the dev machine this was built on (numpy's compiled extensions were not
+# blocked, so this is specific to that pandas build's reputation, not a
+# blanket policy against compiled Python extensions). Revisit the pin once
+# pandas 3.x has wider adoption, or if this environment's policy changes.
+pandas>=2.2,<3.0
+numpy>=1.26
+pyyaml>=6.0
+hydra-core>=1.3
+omegaconf>=2.3
+pytest>=8.0
+# NOTE: scikit-learn is pinned <1.9 for the same Smart App Control /
+# Application Control reason as pandas above (1.9.0's compiled _libsvm
+# extension was blocked; 1.5.2 is not).
+scikit-learn>=1.4,<1.9
+# Same reason: pyarrow 25.0.0 was also blocked; 17.0.0 is not.
+pyarrow>=14.0,<18.0
+
+# Phase 2b dependencies
+# Pure-Python, no compiled extensions -- not expected to hit the Smart App
+# Control issue above, but pinned below latest anyway as a precaution.
+networkx>=3.0,<3.4
+tabulate>=0.9  # DataFrame.to_markdown() in evaluation/report.py
+
+# Phase 3 dependencies (all installed cleanly, no Smart App Control issue
+# this time)
+xgboost>=2.0,<4.0
+river>=0.21,<0.26
+imbalanced-learn>=0.12,<0.15
+# CPU-only wheel -- install via:
+#   pip install torch --index-url https://download.pytorch.org/whl/cpu
+torch>=2.0
+transformers>=4.40
+
+# Phase 4 dependencies
+shap>=0.50,<0.52
+streamlit>=1.35
+plotly>=5.20
+# NOTE: numba (a transitive dependency of shap, used for its clustering
+# utilities) is pinned to 0.60.0 for the same Smart App Control / Application
+# Control reason as pandas/scikit-learn/pyarrow above -- 0.66.0's compiled
+# _devicearray extension was blocked; 0.60.0 is not. Installing this pin
+# pulls numpy down to 2.0.2 on this environment, which trips a pip dependency
+# warning against river>=0.25's declared numpy>=2.3.4 floor -- verified this
+# is a stated-constraint mismatch, not a real break: the full stack (torch,
+# pandas, sklearn, xgboost, river, shap, streamlit, plotly all imported
+# together) and the full pytest suite (25/25, including
+# test_river_online.py) both pass cleanly under numpy 2.0.2.
+numba==0.60.0
+
+# Not yet required, listed here for visibility:
+# mlflow            (experiment tracking -- not yet wired in)

@@ -1,0 +1,19 @@
+venv/
+.venv/
+__pycache__/
+*.pyc
+# Committed as a shipped static file (hosting constraint: "dataset generated
+# once offline and shipped as static file") -- but only at small_dev scale.
+# The eventual full-scale Scale-up run is far too large for git and is
+# regenerated locally from the same tested config instead; see
+# docs/deployment.md.
+data/runs/*
+!data/runs/small_dev/
+mlruns/
+.pytest_cache/
+.hydra/
+*.log
+
+# Local per-machine onboarding-tour progress (dashboard/onboarding.py) --
+# runtime state, not shipped content, same discipline as run artifacts above.
+dashboard/.onboarding_state.json

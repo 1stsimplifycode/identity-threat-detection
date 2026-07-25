@@ -1,0 +1,52 @@
+# Feature-engineering profile shared by both small_dev and default (full
+# scale) top-level configs -- these are algorithmic/behavioral parameters
+# (window sizes, decay rates, refresh cadence), not scale-dependent counts,
+# so one file covers both, matching configs/attacks/default.yaml's pattern.
+
+# Rolling lookback window used by BOTH the behavioral (3a) and graph (3b)
+# feature states for pruning old history -- one shared window concept so a
+# "30-day baseline" means the same thing across both feature families.
+window_days: 30
+
+behavioral:
+  # EMA decay factor for rolling baselines (higher = slower-adapting / more
+  # historical memory, lower = more reactive to recent events).
+  ema_gamma: 0.90
+  # A department (peer group) needs at least this many active members
+  # before peer_group_deviation is computed against it; below this, the
+  # feature returns a neutral sentinel (0.0) rather than an unstable
+  # estimate from a tiny sample.
+  peer_group_min_size: 5
+
+cold_start:
+  # A user within this many days of their join_date is "cold start" --
+  # COLD_START_ELIGIBLE_COLUMNS (feature_engineering/cold_start.py) get
+  # replaced with a department-level prior for these rows, rather than a
+  # raw sentinel/near-zero value that would otherwise look artificially
+  # anomalous (access_chain_distance's cold-start sentinel) or artificially
+  # normal (an EMA baseline starting at exactly 0).
+  window_days: 14
+
+graph:
+  # Recompute Louvain community assignment every N events (not per-event --
+  # community structure is stable enough that per-event recomputation would
+  # be both wasteful and unstable run-to-run).
+  louvain_refresh_events: 500
+  # EMA decay factor for the per-user device-usage distribution feeding
+  # user_device_set_delta.
+  device_ema_gamma: 0.85
+  # Returned by access_chain_distance when the user has no resource history
+  # yet (cold start) or no path exists in the aggregate resource-transition
+  # graph -- a fixed, documented sentinel rather than null/NaN, so it stays
+  # a well-behaved numeric feature for downstream models.
+  access_chain_distance_sentinel: 10.0
+  # BFS cutoff for the device-graph-distance component of is_new_edge, to
+  # bound cost on a large bipartite graph.
+  device_distance_cutoff: 6
+  # Returned by session_hop_seconds when this is the first event seen in a
+  # session (nothing to compute a gap against yet) -- 1 hour, comfortably
+  # larger than both benign resource-chain hop gaps (5-180s,
+  # generator/events.py) and lateral_movement's faster ones (2-20s,
+  # configs/attacks/default.yaml), so an absent gap reads as unambiguously
+  # non-suspicious rather than an artificial 0.
+  session_hop_seconds_sentinel: 3600.0

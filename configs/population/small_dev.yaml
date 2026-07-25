@@ -1,0 +1,29 @@
+# Small-scale population profile for fast local iteration.
+num_users: 5000
+
+department_weights:
+  Engineering: 0.20
+  Sales: 0.15
+  Operations: 0.12
+  IT: 0.10
+  Customer Support: 0.12
+  Finance: 0.08
+  Marketing: 0.08
+  HR: 0.06
+  Legal: 0.04
+  Executive: 0.05
+
+privilege_distribution:
+  standard: 0.82
+  elevated: 0.12
+  admin: 0.055
+  domain_admin: 0.005
+
+work_mode_distribution:
+  onsite: 0.45
+  hybrid: 0.40
+  remote: 0.15
+
+termination_rate: 0.03
+
+home_countries: ["US", "GB", "DE", "IN", "CA", "AU", "BR", "JP", "SG", "FR"]

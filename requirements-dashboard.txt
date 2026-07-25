@@ -1,0 +1,24 @@
+# Minimal dependency set for the DEPLOYED dashboard service only.
+#
+# dashboard/app.py never imports torch, transformers, xgboost, shap, or
+# river -- it only reads precomputed Parquet/JSON artifacts written by
+# dashboard/prepare_data.py (see docs/deployment.md). Installing the full
+# requirements.txt (torch alone is roughly 1GB) on Render's free tier would
+# blow the build-time and image-size budget for dependencies the running
+# service never touches. Data/model regeneration happens locally with the
+# full requirements.txt, and only the resulting small artifacts get
+# committed and redeployed -- this file is what actually ships to Render.
+#
+# networkx IS a deliberate exception to "the dashboard imports nothing
+# heavy": the Knowledge Graph tab lays out a user/device/resource graph
+# client-side, from data already in the loaded artifacts (no new pipeline
+# stage, no new file). It's pure Python with no compiled extensions and no
+# transitive heavy deps (unlike torch/xgboost/shap), so it doesn't threaten
+# the free-tier build-time/image-size budget the way those would.
+pandas>=2.2,<3.0
+numpy>=1.26
+pyarrow>=14.0,<18.0
+scikit-learn>=1.4,<1.9  # precision_recall_curve only
+streamlit>=1.35
+plotly>=5.20
+networkx>=3.0,<4.0

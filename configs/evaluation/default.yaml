@@ -1,0 +1,22 @@
+# Evaluation parameters. Shared by small_dev and default (full-scale).
+
+# Chronological train/test split (constraint #1) -- train on the earlier
+# train_frac of events by timestamp, test on the rest. No shuffling.
+train_frac: 0.7
+
+# Percentile of a model's anomaly-score distribution (on the TRAIN split
+# only, never test) used to pick a single fixed operating threshold for
+# false-positives/day reporting -- e.g. 99 means "flag the top 1% riskiest
+# scores," a threshold chosen without looking at test-set labels.
+operating_threshold_percentile: 99.0
+
+# Whether to train/score the fine-tuned HF bert-tiny model at all.
+# HF's TRAINING cost is capped regardless of scale (models.hf_classifier.
+# max_benign_train_examples), but its INFERENCE-SCORING pass runs over the
+# full train+test split, so at large scale (e.g. the Scale-up config) it
+# becomes one of the most expensive single stages for a model that
+# docs/phase_3_report.md already found to be the weakest performer. Set to
+# false for a materially faster re-run (e.g. iterating on other models at
+# full scale) -- the omission is reported explicitly in the evaluation
+# output, never silently dropped from the comparison table.
+include_hf: true

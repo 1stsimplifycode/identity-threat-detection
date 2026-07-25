@@ -1,0 +1,1 @@
+Synthetic data. Not derived from or validated against real organizational logs. For benchmarking detection methods only.

@@ -1,0 +1,58 @@
+# Small-scale event-timeline profile for fast local iteration:
+# ~5,000 users x 14 days x ~0.7 events/user/day (blended) lands close to the
+# ~50k-event dev target.
+
+start_date: "2026-01-01"
+num_days: 14
+avg_events_per_user_per_day: 0.7
+
+weekend_activity_multiplier: 0.35
+holiday_activity_multiplier: 0.15
+on_leave_activity_multiplier: 0.10
+remote_offhours_multiplier: 1.4
+
+holidays:
+  - "2026-01-01"
+
+failure_rate_baseline: 0.03
+mfa_adoption_rate: 0.70
+new_device_probability: 0.01
+travel_event_probability: 0.02
+
+# Phase 2a additions -- see configs/events/default.yaml for the rationale.
+resource_chain_probability: 0.25
+resource_chain_hops: [1, 4]
+cross_department_resource_probability: 0.03
+shared_kiosk_device_probability: 0.02
+
+# Phase 3: concept-drift schedule (see generator/drift.py). One event, at
+# day 7 (mid-run, given only 14 days total) so the dev profile still
+# exercises drift_detection/ meaningfully despite its short window.
+drift:
+  enabled: true
+  ramp_days: 2
+  schedule:
+    - day: 7
+      change_type: remote_work_shift
+      affected_fraction: 0.20
+      description: "A cohort of users shifts to remote work and relocates"
+
+auth_method_weights:
+  password: 0.45
+  sso: 0.35
+  mfa_push: 0.12
+  mfa_otp: 0.06
+  api_token: 0.02
+
+failure_reason_weights:
+  bad_password: 0.55
+  mfa_denied: 0.20
+  account_locked: 0.15
+  unknown_user: 0.10
+
+device_type_weights:
+  desktop: 0.45
+  laptop: 0.30
+  mobile: 0.20
+  server: 0.03
+  unknown: 0.02

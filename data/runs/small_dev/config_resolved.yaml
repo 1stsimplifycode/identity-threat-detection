@@ -1,0 +1,157 @@
+population:
+  num_users: 5000
+  department_weights:
+    Engineering: 0.2
+    Sales: 0.15
+    Operations: 0.12
+    IT: 0.1
+    Customer Support: 0.12
+    Finance: 0.08
+    Marketing: 0.08
+    HR: 0.06
+    Legal: 0.04
+    Executive: 0.05
+  privilege_distribution:
+    standard: 0.82
+    elevated: 0.12
+    admin: 0.055
+    domain_admin: 0.005
+  work_mode_distribution:
+    onsite: 0.45
+    hybrid: 0.4
+    remote: 0.15
+  termination_rate: 0.03
+  home_countries:
+  - US
+  - GB
+  - DE
+  - IN
+  - CA
+  - AU
+  - BR
+  - JP
+  - SG
+  - FR
+events:
+  start_date: '2026-01-01'
+  num_days: 14
+  avg_events_per_user_per_day: 0.7
+  weekend_activity_multiplier: 0.35
+  holiday_activity_multiplier: 0.15
+  on_leave_activity_multiplier: 0.1
+  remote_offhours_multiplier: 1.4
+  holidays:
+  - '2026-01-01'
+  failure_rate_baseline: 0.03
+  mfa_adoption_rate: 0.7
+  new_device_probability: 0.01
+  travel_event_probability: 0.02
+  resource_chain_probability: 0.25
+  resource_chain_hops:
+  - 1
+  - 4
+  cross_department_resource_probability: 0.03
+  shared_kiosk_device_probability: 0.02
+  drift:
+    enabled: true
+    ramp_days: 2
+    schedule:
+    - day: 7
+      change_type: remote_work_shift
+      affected_fraction: 0.2
+      description: A cohort of users shifts to remote work and relocates
+  auth_method_weights:
+    password: 0.45
+    sso: 0.35
+    mfa_push: 0.12
+    mfa_otp: 0.06
+    api_token: 0.02
+  failure_reason_weights:
+    bad_password: 0.55
+    mfa_denied: 0.2
+    account_locked: 0.15
+    unknown_user: 0.1
+  device_type_weights:
+    desktop: 0.45
+    laptop: 0.3
+    mobile: 0.2
+    server: 0.03
+    unknown: 0.02
+attacks:
+  enabled_attacks:
+  - brute_force
+  - impossible_travel
+  - credential_misuse
+  - lateral_movement
+  - device_spoofing
+  imbalance_ratio: 0.005
+  num_generation_batches: 16
+  severity_weights:
+    low: 0.35
+    medium: 0.35
+    high: 0.2
+    critical: 0.1
+  brute_force:
+    min_attempts: 8
+    max_attempts: 60
+    window_minutes:
+    - 2
+    - 15
+    success_probability: 0.15
+    attacker_device_type_weights:
+      desktop: 0.5
+      laptop: 0.3
+      server: 0.2
+  impossible_travel:
+    min_distance_km: 500
+    max_distance_km: 15000
+    time_window_minutes:
+    - 5
+    - 90
+    min_implied_speed_kmh: 700
+    attacker_device_type_weights:
+      desktop: 0.4
+      laptop: 0.4
+      mobile: 0.2
+  lateral_movement:
+    min_hops: 2
+    max_hops: 4
+    hop_gap_seconds:
+    - 2
+    - 20
+  device_spoofing:
+    fingerprint_mismatch_probability: 0.5
+    reappearance_minutes:
+    - 10
+    - 240
+feature_engineering:
+  window_days: 30
+  behavioral:
+    ema_gamma: 0.9
+    peer_group_min_size: 5
+  graph:
+    louvain_refresh_events: 500
+    device_ema_gamma: 0.85
+    access_chain_distance_sentinel: 10.0
+    device_distance_cutoff: 6
+models:
+  baseline:
+    failed_login_window_minutes: 15
+    failed_login_count_threshold: 5
+    risk_score_threshold: 2
+  isolation_forest:
+    n_estimators: 200
+    contamination: 0.02
+    random_state: 42
+evaluation:
+  train_frac: 0.7
+  operating_threshold_percentile: 99.0
+seed: 42
+run:
+  name: small_dev
+  output_dir: data/runs/${run.name}
+mlflow:
+  experiment_name: identity-threat-detection-dev
+  tracking_uri: file:./mlruns
+audit:
+  leakage_epsilon: 0.05

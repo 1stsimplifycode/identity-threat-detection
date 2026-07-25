@@ -1,0 +1,83 @@
+# MITRE ATT&CK mapping table for synthetic attack generation.
+#
+# This file is the single source of truth for which technique IDs a given
+# synthetic attack type is tagged with. It must be extended *before* a new
+# attack type's generator is written -- never inferred after the fact.
+#
+# schema_version bumps whenever tactic/technique assignments change, so that
+# generated attack records (which store mitre_mapping_version) can always be
+# traced back to the exact mapping that produced them.
+
+schema_version: 2
+mitre_attack_version: "v14 (Enterprise)"
+
+mappings:
+  brute_force:
+    tactic: "Credential Access"
+    tactic_id: "TA0006"
+    technique_ids: ["T1110", "T1110.001", "T1110.003"]
+    technique_names:
+      T1110: "Brute Force"
+      T1110.001: "Brute Force: Password Guessing"
+      T1110.003: "Brute Force: Password Spraying"
+    notes: >
+      Repeated authentication failures against one account within a short
+      window, from a device/IP not previously associated with that account,
+      optionally ending in a successful login (compromise).
+
+  impossible_travel:
+    tactic: "Initial Access"
+    tactic_id: "TA0001"
+    technique_ids: ["T1078", "T1078.004"]
+    technique_names:
+      T1078: "Valid Accounts"
+      T1078.004: "Valid Accounts: Cloud Accounts"
+    notes: >
+      A successful login for an account occurs at a location whose distance
+      from that account's immediately preceding successful login implies a
+      physically impossible travel speed, indicating likely credential
+      compromise or session hijacking.
+
+  credential_misuse:
+    tactic: "Privilege Escalation"
+    tactic_id: "TA0004"
+    technique_ids: ["T1078", "T1078.002"]
+    technique_names:
+      T1078: "Valid Accounts"
+      T1078.002: "Valid Accounts: Domain Accounts"
+    notes: >
+      A successful, single-attempt login (not a brute-force burst) whose
+      subsequent resource access falls outside both the account's normal
+      department and its normal privilege scope -- e.g. standard-privilege
+      access reaching an admin console -- indicating the valid credential is
+      likely being used by someone other than its legitimate owner.
+
+  lateral_movement:
+    tactic: "Lateral Movement"
+    tactic_id: "TA0008"
+    technique_ids: ["T1021"]
+    technique_names:
+      T1021: "Remote Services"
+    notes: >
+      A chain of resource-to-resource transitions within one session that
+      have low historical co-occurrence and trend toward higher-value
+      systems, inconsistent with the account's normal single-department
+      access footprint. T1021 is the best generic fit; this project does not
+      distinguish which specific remote-service protocol was used.
+
+  device_spoofing:
+    tactic: "Defense Evasion"
+    tactic_id: "TA0005"
+    technique_ids: ["T1036"]
+    technique_names:
+      T1036: "Masquerading"
+    notes: >
+      APPROXIMATE MAPPING -- Enterprise ATT&CK has no single technique that
+      cleanly means "device fingerprint spoofing." T1036 (Masquerading) is
+      the closest available fit and is used here as a best-effort tag, not a
+      precise match; per the problem statement's own "no MITRE ontology
+      sprawl" instruction, this project does not attempt to invent a more
+      specific classification. Covers two generated variants: (a) a
+      previously-known device_id reappearing with a different device_type/os
+      than its established signature, and (b) a device_id normally scoped to
+      one user being reused by a different user shortly after.

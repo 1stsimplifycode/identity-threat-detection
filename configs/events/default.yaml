@@ -1,0 +1,71 @@
+# Full-scale event-timeline profile: ~8,000 users x 120 days x ~1.0
+# events/user/day (blended for weekends/holidays) lands close to the
+# "hundreds of thousands to ~1M records" scale-up target using the same
+# generation code as small_dev.
+
+start_date: "2026-01-01"
+num_days: 120
+avg_events_per_user_per_day: 1.0
+
+weekend_activity_multiplier: 0.35
+holiday_activity_multiplier: 0.15
+on_leave_activity_multiplier: 0.10
+remote_offhours_multiplier: 1.4
+
+holidays:
+  - "2026-01-01"
+  - "2026-01-19"
+  - "2026-02-16"
+  - "2026-04-03"
+
+failure_rate_baseline: 0.03
+mfa_adoption_rate: 0.70
+new_device_probability: 0.01
+travel_event_probability: 0.02
+
+# Phase 2a additions: benign resource_access chains, cross-department access,
+# and shared-kiosk devices -- see generator/events.py's module docstring for
+# why these exist (keeping attacks/lateral_movement.py,
+# attacks/credential_misuse.py, and attacks/device_spoofing.py's tells from
+# being 100%-exclusive to attack traffic).
+resource_chain_probability: 0.25
+resource_chain_hops: [1, 4]
+cross_department_resource_probability: 0.03
+shared_kiosk_device_probability: 0.02
+
+# Phase 3: concept-drift schedule (see generator/drift.py). Two events,
+# matching the original design note's example ("at day 30/40, shift a
+# cohort of users to new office location and remote work") plus a later
+# schedule-pattern shift, spread across the 120-day full-scale window.
+drift:
+  enabled: true
+  ramp_days: 5
+  schedule:
+    - day: 40
+      change_type: remote_work_shift
+      affected_fraction: 0.20
+      description: "A cohort of users shifts to remote work and relocates"
+    - day: 80
+      change_type: schedule_shift
+      affected_fraction: 0.15
+      description: "A cohort of users shifts to a later daily shift pattern"
+
+auth_method_weights:
+  password: 0.45
+  sso: 0.35
+  mfa_push: 0.12
+  mfa_otp: 0.06
+  api_token: 0.02
+
+failure_reason_weights:
+  bad_password: 0.55
+  mfa_denied: 0.20
+  account_locked: 0.15
+  unknown_user: 0.10
+
+device_type_weights:
+  desktop: 0.45
+  laptop: 0.30
+  mobile: 0.20
+  server: 0.03
+  unknown: 0.02

@@ -1,0 +1,30 @@
+# Fast local-iteration profile. Target: full dev loop (generate + validate +
+# leakage-audit) under 5 minutes on a laptop.
+defaults:
+  - population: small_dev
+  - events: small_dev
+  - attacks: default
+  - feature_engineering: default
+  - models: default
+  - evaluation: default
+  - dashboard: default
+  - _self_
+
+seed: 42
+
+run:
+  name: small_dev
+  output_dir: data/runs/${run.name}
+
+mlflow:
+  experiment_name: identity-threat-detection-dev
+  tracking_uri: file:./mlruns
+
+audit:
+  leakage_epsilon: 0.05
+
+hydra:
+  job:
+    chdir: false
+  run:
+    dir: .

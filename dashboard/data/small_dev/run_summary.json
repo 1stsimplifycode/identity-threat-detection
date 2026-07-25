@@ -1,0 +1,65 @@
+{
+  "generated_at": "2026-07-25T14:25:00.368797+00:00",
+  "disclaimer": "Synthetic data. Not derived from or validated against real organizational logs. For benchmarking detection methods only.",
+  "run_name": "small_dev",
+  "n_users": 5000,
+  "n_events": 57436,
+  "n_train": 40205,
+  "n_test": 17231,
+  "split_summary": "Chronological split: train_frac=0.70, split_timestamp=2026-01-11 11:13:02, n_train=40205, n_test=17231",
+  "primary_model": "xgboost_smote",
+  "threshold_slider_min": 3.445148468017578e-05,
+  "threshold_slider_max": 0.9999984502792358,
+  "threshold_default": 0.010706828907132149,
+  "n_flagged_explained": 2000,
+  "feature_columns": [
+    "velocity_kmh",
+    "geo_distance_from_home_km",
+    "login_location_entropy",
+    "device_switch_rate",
+    "failed_login_ratio",
+    "peer_group_deviation",
+    "ema_failure_rate",
+    "device_fan_in",
+    "user_device_set_delta",
+    "is_new_edge",
+    "access_chain_distance",
+    "peer_community_deviation",
+    "device_fingerprint_mismatch",
+    "session_foreign_resource_count",
+    "session_hop_seconds"
+  ],
+  "departments": [
+    "Engineering",
+    "Sales",
+    "Finance",
+    "HR",
+    "IT",
+    "Legal",
+    "Operations",
+    "Marketing",
+    "Executive",
+    "Customer Support"
+  ],
+  "attack_types": [
+    "brute_force",
+    "impossible_travel",
+    "credential_misuse",
+    "lateral_movement",
+    "device_spoofing"
+  ],
+  "severities": [
+    "low",
+    "medium",
+    "high",
+    "critical"
+  ],
+  "drift_eval": [
+    {
+      "day": 7,
+      "change_type": "remote_work_shift",
+      "detected": true,
+      "detection_lag_days": 0.49
+    }
+  ]
+}

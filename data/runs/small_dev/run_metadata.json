@@ -1,0 +1,13 @@
+{
+  "disclaimer": "Synthetic data. Not derived from or validated against real organizational logs. For benchmarking detection methods only.",
+  "config_hash": "e6d17f7eb5177a7c",
+  "seed": 42,
+  "num_users": 5000,
+  "num_events": 57436,
+  "num_attack_events": 320,
+  "attack_ratio_actual": 0.0055714186224667455,
+  "num_drift_events": 1,
+  "total_drift_affected_users": 971,
+  "num_attack_campaigns": 36,
+  "mitre_mapping_version": 2
+}

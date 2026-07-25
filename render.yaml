@@ -1,0 +1,22 @@
+# Render Blueprint -- ONE free-tier web service, no database, no
+# background workers. The deployed dashboard is fully read-only: it only
+# reads Parquet/JSON artifacts already committed to this repo
+# (dashboard/data/<run>/, written offline by dashboard/prepare_data.py) --
+# it never trains a model, computes SHAP, or writes to disk itself. That
+# means Render's ephemeral disk is a non-issue here: every cold start pulls
+# a fresh container from the same committed repo, which already has
+# everything the app needs. See docs/deployment.md for the full reasoning
+# and the local regenerate-and-redeploy workflow.
+services:
+  - type: web
+    name: identity-threat-detection-dashboard
+    runtime: python
+    plan: free
+    region: oregon
+    branch: main
+    buildCommand: "pip install -r requirements-dashboard.txt"
+    startCommand: "streamlit run dashboard/app.py --server.port $PORT --server.address 0.0.0.0"
+    healthCheckPath: /
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9

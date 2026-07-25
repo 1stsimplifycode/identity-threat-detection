@@ -1,0 +1,30 @@
+# Full-scale profile. Used only in the "Scale-up" stage, after all phases
+# are validated at small_dev scale with the same generation code.
+defaults:
+  - population: default
+  - events: default
+  - attacks: default
+  - feature_engineering: default
+  - models: default
+  - evaluation: default
+  - dashboard: default
+  - _self_
+
+seed: 42
+
+run:
+  name: default
+  output_dir: data/runs/${run.name}
+
+mlflow:
+  experiment_name: identity-threat-detection
+  tracking_uri: file:./mlruns
+
+audit:
+  leakage_epsilon: 0.05
+
+hydra:
+  job:
+    chdir: false
+  run:
+    dir: .

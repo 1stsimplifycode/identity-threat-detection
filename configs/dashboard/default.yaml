@@ -1,0 +1,25 @@
+# Dashboard precomputation parameters (Phase 4). Shared by small_dev and
+# default (full-scale) -- these bound the offline data-prep job's cost, not
+# the generated data's scale.
+
+# The interactive detection-threshold slider's range, expressed as
+# percentiles of the primary model's TRAIN-split score distribution -- the
+# same "never look at test labels to pick a threshold" discipline as
+# evaluation.operating_threshold_percentile (its value is the slider's
+# default position). Precomputed explanations are generated for every test
+# event flagged at threshold_slider_min_percentile -- a generous superset of
+# whatever the slider can flag at any position the analyst drags it to, so
+# nothing needs live recomputation while dragging.
+threshold_slider_min_percentile: 90.0
+threshold_slider_max_percentile: 99.9
+
+# Caps the offline SHAP/streaming-approx precomputation job -- see
+# models.shap_explainability.max_flagged_samples for the same idea applied
+# to the six-criteria evaluation report's own SHAP sample.
+max_precomputed_events: 3000
+sample_seed: 42
+
+# How many of a drilled-into user's own historical events to include in the
+# trend-chart data (most recent N, chronological) -- keeps per-user
+# drill-down payloads small regardless of how long a user's history is.
+trend_history_max_events: 500

@@ -1,0 +1,104 @@
+# Model hyperparameters. Shared by small_dev and default (full-scale) --
+# these are algorithm parameters, not scale-dependent counts.
+
+baseline:
+  # "static thresholds: failed-login count, new-country flag, off-hours
+  # flag" per the problem statement -- this model never looks at the
+  # engineered feature table at all, only raw event fields, by design (it's
+  # the naive comparison point every other model must beat).
+  failed_login_window_minutes: 15
+  failed_login_count_threshold: 5
+  # rule_risk_score (sum of the 3 binary flags, range 0-3) at or above this
+  # is flagged as anomalous for classification-style metrics.
+  risk_score_threshold: 2
+
+isolation_forest:
+  n_estimators: 200
+  # Expected anomaly proportion passed to sklearn's IsolationForest --
+  # intentionally set higher than the dataset's actual attack ratio
+  # (configs/attacks/default.yaml's imbalance_ratio), since this model is
+  # unsupervised and has no way to know the true rate; treated as a model
+  # hyperparameter to tune, not copied from the label distribution.
+  contamination: 0.02
+  random_state: 42
+
+xgboost:
+  n_estimators: 300
+  max_depth: 6
+  learning_rate: 0.1
+  random_state: 42
+  # Compared identically against each other and against no resampling, per
+  # the problem statement's imbalance-handling requirement.
+  imbalance_methods: ["none", "class_weight", "smote"]
+
+hf_classifier:
+  checkpoint: "prajjwal1/bert-tiny"  # ~4.4M params, CPU-inference-viable; see docs/phase_3_report.md
+  # Last-k events per training example, serialized + concatenated: the one
+  # thing a sequence encoder can plausibly do that a flat per-row XGBoost
+  # input can't is model short-term ORDER.
+  sequence_length_k: 5
+  max_length: 256
+  batch_size: 16
+  epochs: 3
+  learning_rate: 5.0e-5
+  # CPU-only fine-tuning throughput on the dev machine this was built on is
+  # ~34 examples/sec regardless of batch size (compute-bound, not I/O- or
+  # batch-size-bound) -- training on the FULL small_dev train split (~40k
+  # rows) x 3 epochs would take close to an hour. All attack-labeled train
+  # rows are always kept; the overwhelming benign majority is subsampled to
+  # at most this many rows -- a standard, defensible undersampling practice
+  # for imbalanced sequence classification, and an honest CPU-time tradeoff
+  # documented in docs/phase_3_report.md, not a silently shrunk dataset.
+  max_benign_train_examples: 6000
+
+river_online:
+  # river.forest.ARFClassifier (Adaptive Random Forest) -- switched from a
+  # single HoeffdingTreeClassifier after direct testing showed the single
+  # tree never split even once on this data (severe imbalance + a signal
+  # that needs feature interactions a lone incremental split can't find
+  # from marginal distributions alone); see online_learning/river_model.py's
+  # module docstring for the full investigation.
+  n_models: 10
+  seed: 42
+
+adwin:
+  delta: 0.002  # River ADWIN's sensitivity parameter (lower = more sensitive)
+  # Monitoring granularity: mean geo_distance_from_home_km over this many
+  # consecutive (chronologically-ordered) events per bin, not raw per-event
+  # values -- found necessary by direct testing (see
+  # drift_detection/adwin_detector.py's module docstring for why raw
+  # per-event and calendar-day aggregation both failed).
+  bin_size: 100
+
+shap_explainability:
+  # Exact SHAP (shap.TreeExplainer over the winning xgboost_smote model,
+  # per docs/phase_3_report.md) runs ONLY here, offline, over flagged test
+  # events -- never in the streaming path (constraint #4). At small_dev
+  # scale every flagged event is cheap enough to explain in full; this cap
+  # exists for the eventual Scale-up phase's much larger flagged-event
+  # count, so a single dashboard-data-prep run stays bounded. null = no cap.
+  max_flagged_samples: 2000
+  top_k_features: 5
+  sample_seed: 42
+
+zkp:
+  # Zero-knowledge threshold proofs (see docs/zero_knowledge_proofs.md):
+  # each proof takes a few seconds to generate/verify (hand-rolled
+  # Pedersen + Sigma-protocol crypto over a 2048-bit group -- see
+  # zkp/group.py), so unlike SHAP this deliberately proves only a small
+  # SAMPLE of flagged events, not every one -- generating one per flagged
+  # event at full scale (thousands of events) would take hours for a
+  # feature whose purpose here is to demonstrate the cryptographic
+  # technique end-to-end, not to cryptographically cover every row.
+  enabled: true
+  max_proof_samples: 25
+  # Fixed-point scale for converting the float anomaly score into a
+  # bounded integer suitable for bit-decomposition (see
+  # zkp/range_proof.py's to_fixed_point) -- 10_000 keeps 4 decimal
+  # digits, matching the precision already reported in the evaluation
+  # tables (e.g. "precision: 0.5558").
+  scale: 10000
+  # scores are normalized to [0, 1], so fixed-point values top out at
+  # `scale` (10_000); 16 bits (max 65_535) covers that with headroom.
+  n_bits: 16
+  sample_seed: 42

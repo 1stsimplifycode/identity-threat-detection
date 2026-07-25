@@ -1,0 +1,21 @@
+# Base Streamlit theme -- an enterprise/industrial security-ops palette:
+# dark neutral ground, blue as the one accent, red/amber/green reserved
+# specifically for severity (applied via dashboard/theme.py's custom CSS,
+# not here). Fine-grained chip/badge/typography styling lives in
+# dashboard/theme.py's injected CSS; this file sets the base Streamlit
+# widget palette so native components (buttons, sliders, inputs) match
+# without per-widget overrides.
+[theme]
+base = "dark"
+primaryColor = "#3B82F6"
+backgroundColor = "#0B0E14"
+secondaryBackgroundColor = "#141920"
+textColor = "#E6EAF0"
+font = "sans serif"
+
+[server]
+headless = true
+enableXsrfProtection = true
+
+[browser]
+gatherUsageStats = false

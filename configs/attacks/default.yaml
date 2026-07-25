@@ -1,0 +1,58 @@
+# Attack-injection profile. Shared by both small_dev and default (full-scale)
+# top-level configs: the imbalance ratio and per-attack-type parameters are
+# scale-independent ratios, not counts, so one file covers both.
+
+enabled_attacks: ["brute_force", "impossible_travel", "credential_misuse", "lateral_movement", "device_spoofing"]
+
+# Fraction of ALL events (benign + attack) that are attack-labeled.
+imbalance_ratio: 0.005
+
+# Number of synthetic "generation batches" (parallel-shard bookkeeping IDs)
+# assigned uniformly at random to every event, independent of label/time.
+# Used only for the leakage audit's metadata-only fields.
+num_generation_batches: 16
+
+severity_weights:
+  low: 0.35
+  medium: 0.35
+  high: 0.20
+  critical: 0.10
+
+brute_force:
+  min_attempts: 8
+  max_attempts: 60
+  window_minutes: [2, 15]
+  success_probability: 0.15
+  attacker_device_type_weights:
+    desktop: 0.5
+    laptop: 0.3
+    server: 0.2
+
+impossible_travel:
+  min_distance_km: 500
+  max_distance_km: 15000
+  time_window_minutes: [5, 90]
+  min_implied_speed_kmh: 700
+  attacker_device_type_weights:
+    desktop: 0.4
+    laptop: 0.4
+    mobile: 0.2
+
+# credential_misuse has no scale-dependent parameters of its own -- the
+# overreach resource/privilege logic reads directly from
+# generator/constants.py's MIN_PRIVILEGE_BY_RESOURCE and
+# RESOURCE_TYPES_BY_DEPT, and severity from severity_weights above.
+
+lateral_movement:
+  min_hops: 2
+  max_hops: 4
+  # Deliberately shorter than generator/events.py's benign resource-chain
+  # inter-hop gaps (5-180s) -- faster hopping is a secondary, non-exclusive
+  # tell; the primary signal is the cross-department chain composition.
+  hop_gap_seconds: [2, 20]
+
+device_spoofing:
+  fingerprint_mismatch_probability: 0.5
+  # Minutes after the device's established owner's last use before it
+  # reappears with a different signature or a different user.
+  reappearance_minutes: [10, 240]

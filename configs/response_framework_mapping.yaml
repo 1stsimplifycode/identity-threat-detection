@@ -1,0 +1,71 @@
+# NIST Cybersecurity Framework (CSF) v1.1 and CIS Critical Security
+# Controls v8 mappings for the recommendation engine's candidate response
+# actions (dashboard/app.py's ACTION_LABELS).
+#
+# Same sourcing discipline as configs/mitre_mapping.yaml: every code below
+# is a real, published category from the actual NIST CSF v1.1 / CIS
+# Controls v8 documents, not invented. This is an ILLUSTRATIVE mapping
+# (which published category a given response action most directly falls
+# under), not a formal compliance attestation -- a real organization's
+# control owner would confirm the exact mapping against their own control
+# implementation. Shown in the dashboard captioned as such.
+
+schema_version: 1
+
+action_mappings:
+  disable_account:
+    nist_csf:
+      - id: "PR.AC-1"
+        name: "Identities and credentials are issued, managed, verified, revoked, and audited for authorized devices, users and processes"
+      - id: "RS.MI-1"
+        name: "Incidents are contained"
+    cis_controls_v8:
+      - id: "5.3"
+        name: "Disable Dormant Accounts"
+        control: "CIS Control 5: Account Management"
+
+  require_mfa:
+    nist_csf:
+      - id: "PR.AC-7"
+        name: "Users, devices, and other assets are authenticated (e.g., single-factor, multi-factor) commensurate with the risk of the transaction"
+    cis_controls_v8:
+      - id: "6.3"
+        name: "Require MFA for Externally-Exposed Applications"
+        control: "CIS Control 6: Access Control Management"
+      - id: "6.5"
+        name: "Require MFA for Administrative Access"
+        control: "CIS Control 6: Access Control Management"
+
+  reset_password:
+    nist_csf:
+      - id: "PR.AC-1"
+        name: "Identities and credentials are issued, managed, verified, revoked, and audited for authorized devices, users and processes"
+    cis_controls_v8:
+      - id: "5.2"
+        name: "Use Unique Passwords"
+        control: "CIS Control 5: Account Management"
+
+  block_device:
+    nist_csf:
+      - id: "PR.PT-1"
+        name: "Audit/log records are determined, documented, implemented, and reviewed in accordance with policy"
+      - id: "DE.CM-1"
+        name: "The network is monitored to detect potential cybersecurity events"
+    cis_controls_v8:
+      - id: "13.1"
+        name: "Centralize Security Event Alerting"
+        control: "CIS Control 13: Network Monitoring and Defense"
+
+  escalate_soc:
+    nist_csf:
+      - id: "DE.CM-3"
+        name: "Personnel activity is monitored to detect potential cybersecurity events"
+      - id: "RS.AN-1"
+        name: "Notifications from detection systems are investigated"
+    cis_controls_v8:
+      - id: "17.4"
+        name: "Establish and Maintain an Incident Response Process"
+        control: "CIS Control 17: Incident Response Management"
+      - id: "8.11"
+        name: "Conduct Audit Log Reviews"
+        control: "CIS Control 8: Audit Log Management"
